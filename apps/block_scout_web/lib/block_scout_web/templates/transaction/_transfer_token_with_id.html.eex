@@ -1,2 +1,13 @@
-<%= "TokenID " %><%= render BlockScoutWeb.TransactionView, "_link_to_token_instance.html", transfer: @transfer, token_id: @token_id %>
+<% template = @instance.template %>
+<%= if template do %>
+  <%= if template.symbol do %>
+    <%= "$" %>
+    <%= template.symbol %>
+  <% else %>
+    <%= template.name %>
+  <% end %>
+<% else %>
+  <%= "TokenID " %>
+<% end %>
+<%= render BlockScoutWeb.TransactionView, "_link_to_token_instance.html", transfer: @transfer, token_id: @token_id %>
 <%= " " %><%= render BlockScoutWeb.TransactionView, "_link_to_token_symbol.html", transfer: @transfer %>

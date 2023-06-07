@@ -1,13 +1,18 @@
+<% template = Map.get(@token_instance, :instance).template %>
 <section class="address-overview">
   <div class="row">
     <div class="card-section col-md-12 col-lg-7 pr-0-md js-ad-dependant-mb-2">
       <div class="card">
         <div class="card-body">
           <h1 class="card-title">
-            <%= if token_name?(@token) do %>
-              <%= link(@token.name, to: token_path(BlockScoutWeb.Endpoint, :show, @token.contract_address_hash)) %>
+            <%= if template do %>
+              <%= Map.get(template, :name) || Map.get(template, :symbol) %>
             <% else %>
-              <%= gettext("Token Details") %>
+              <%= if token_name?(@token) do %>
+                <%= link(@token.name, to: token_path(BlockScoutWeb.Endpoint, :show, @token.contract_address_hash)) %>
+              <% else %>
+                <%= gettext("Token Details") %>
+              <% end %>
             <% end %>
             <!-- buttons -->
             <span class="overview-title-buttons token float-right">
@@ -34,7 +39,10 @@
               <%= render BlockScoutWeb.CommonComponentsView, "_btn_qr_code.html" %>
             </span>
           </h1>
-
+          <%= if template do %>
+            <h3 style="line-height: 14px;"><%= gettext "Circulating Supply" %>: <%= to_string(Map.get(template, :circulating_supply)) %></h3>
+            <h3 style="line-height: 14px;"><%= gettext "Max Supply" %>: <%= format_max_supply(Map.get(template, :cap)) %></h3>
+          <% end %>
           <h3><%= gettext "Token ID" %>: <%= to_string(@token_id) %></h3>
 
           <div class="d-flex flex-column flex-md-row justify-content-start text-muted">
@@ -66,7 +74,12 @@
                 <source src=<%= media_src(@token_instance.instance, true) %> type="video/mp4">
               </video>
             <% else %>
-              <img src=<%= media_src(@token_instance.instance, true) %> />
+              <% image_url = Map.get(@token_instance.instance, :image_url) %>
+              <%= if image_url do %>
+                <img src=<%= image_url %> />
+              <% else %>
+                <img src=<%= media_src(@token_instance.instance, true) %> />
+              <% end %>
             <% end %>
           </div>
         </div>

@@ -147,7 +147,8 @@ defmodule BlockScoutWeb.TransactionView do
       amounts: [],
       token_ids: token_transfer.token_ids,
       to_address_hash: token_transfer.to_address_hash,
-      from_address_hash: token_transfer.from_address_hash
+      from_address_hash: token_transfer.from_address_hash,
+      instances: token_transfer.instances
     }
 
     {acc1, [new_entry | acc2]}
@@ -161,7 +162,8 @@ defmodule BlockScoutWeb.TransactionView do
       amounts: amounts,
       token_ids: token_transfer.token_ids,
       to_address_hash: token_transfer.to_address_hash,
-      from_address_hash: token_transfer.from_address_hash
+      from_address_hash: token_transfer.from_address_hash,
+      instances: token_transfer.instances
     }
 
     {acc1, [new_entry | acc2]}
@@ -174,7 +176,8 @@ defmodule BlockScoutWeb.TransactionView do
       amounts: [],
       token_ids: token_transfer.token_ids,
       to_address_hash: token_transfer.to_address_hash,
-      from_address_hash: token_transfer.from_address_hash
+      from_address_hash: token_transfer.from_address_hash,
+      instances: token_transfer.instances
     }
 
     existing_entry =

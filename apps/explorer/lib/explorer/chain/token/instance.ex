@@ -5,7 +5,7 @@ defmodule Explorer.Chain.Token.Instance do
 
   use Explorer.Schema
 
-  alias Explorer.Chain.{Address, Hash, Token, TokenTransfer}
+  alias Explorer.Chain.{Address, Hash, Token, TokenTransfer, Template}
   alias Explorer.Chain.Token.Instance
   alias Explorer.PagingOptions
 
@@ -20,7 +20,9 @@ defmodule Explorer.Chain.Token.Instance do
           token_id: non_neg_integer(),
           token_contract_address_hash: Hash.Address.t(),
           metadata: map() | nil,
-          error: String.t()
+          error: String.t(),
+          template_id: non_neg_integer() | nil,
+          image_url: String.t() | nil
         }
 
   @primary_key false
@@ -28,6 +30,7 @@ defmodule Explorer.Chain.Token.Instance do
     field(:token_id, :decimal, primary_key: true)
     field(:metadata, :map)
     field(:error, :string)
+    field(:image_url, :string)
 
     belongs_to(:owner, Address, references: :hash, define_field: false)
 
@@ -40,14 +43,17 @@ defmodule Explorer.Chain.Token.Instance do
       primary_key: true
     )
 
+    belongs_to(:template, Template)
+
     timestamps()
   end
 
   def changeset(%Instance{} = instance, params \\ %{}) do
     instance
-    |> cast(params, [:token_id, :metadata, :token_contract_address_hash, :error])
+    |> cast(params, [:token_id, :metadata, :token_contract_address_hash, :error, :template_id, :image_url])
     |> validate_required([:token_id, :token_contract_address_hash])
     |> foreign_key_constraint(:token_contract_address_hash)
+    |> foreign_key_constraint(:template)
   end
 
   @doc """

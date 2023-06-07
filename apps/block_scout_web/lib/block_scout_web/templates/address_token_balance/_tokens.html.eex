@@ -4,6 +4,9 @@
   </h6>
 
   <%= for {token_balance, token} <- @token_balances do %>
+    <% instance = List.first(token_balance.token_instances) %>
+    <% template = Map.get(instance, :template) %>
+    <% IO.inspect template %>
     <div
       class="border-bottom"
       data-dropdown-token-balance-test
@@ -32,7 +35,12 @@
               additional_classes: ["token-wallet-icon"]
             %>
           <% end %>
-          <p class="mb-0 col-md-6 pl-0 pr-0 el-1 flex-grow-2 <%= if !Application.get_env(:block_scout_web, :display_token_icons), do: "ml-5px" %>"><%= token_name(token) %>
+          <p class="mb-0 col-md-6 pl-0 pr-0 el-1 flex-grow-2 <%= if !Application.get_env(:block_scout_web, :display_token_icons), do: "ml-5px" %>">
+            <%= if template do %>
+              <%= template.name %>
+            <% else %>
+              <%= token_name(token) %>
+            <% end %>
           </p>
           <%= if token.fiat_value && token.decimals do %>
             <p class="mb-0 col-md-6 text-right usd-total">

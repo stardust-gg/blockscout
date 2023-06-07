@@ -61,6 +61,8 @@ defmodule Explorer.Chain.Address.CurrentTokenBalance do
       type: Hash.Address
     )
 
+    has_many(:token_instances, Token.Instance, foreign_key: :token_id, references: :token_id)
+
     timestamps()
   end
 
@@ -174,7 +176,8 @@ defmodule Explorer.Chain.Address.CurrentTokenBalance do
       on: ctb.token_contract_address_hash == t.contract_address_hash,
       select: {ctb, t},
       order_by: ^[desc_nulls_last: fiat_balance],
-      order_by: [desc: ctb.value, desc: ctb.id]
+      order_by: [desc: ctb.value, desc: ctb.id],
+      preload: [token_instances: :template]
     )
   end
 
@@ -189,7 +192,8 @@ defmodule Explorer.Chain.Address.CurrentTokenBalance do
       on: ctb.token_contract_address_hash == t.contract_address_hash,
       select: {ctb, t},
       order_by: ^[desc_nulls_last: fiat_balance],
-      order_by: [desc: ctb.value, desc: ctb.id]
+      order_by: [desc: ctb.value, desc: ctb.id],
+      preload: [token_instances: :template]
     )
   end
 

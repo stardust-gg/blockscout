@@ -57,6 +57,7 @@ defmodule Explorer.Chain do
     PendingBlockOperation,
     SmartContract,
     SmartContractAdditionalSource,
+    Template,
     Token,
     Token.Instance,
     TokenTransfer,
@@ -108,7 +109,8 @@ defmodule Explorer.Chain do
     [to_address: :smart_contract] => :optional,
     [from_address: :names] => :optional,
     [to_address: :names] => :optional,
-    token: :required
+    token: :required,
+    instances: :template
   }
 
   @method_name_to_id_map %{
@@ -583,6 +585,7 @@ defmodule Explorer.Chain do
     |> Transaction.transactions_with_token_transfers_direction(address_hash)
     |> Transaction.preload_token_transfers(address_hash)
     |> handle_paging_options(paging_options)
+    |> preload([token_transfers: [instances: :template]])
     |> Repo.all()
   end
 
@@ -597,6 +600,7 @@ defmodule Explorer.Chain do
     |> TokenTransfer.token_transfers_by_address_hash(address_hash, filters)
     |> join_associations(necessity_by_association)
     |> TokenTransfer.handle_paging_options(paging_options)
+    |> preload([token_transfers: [instances: :template]])
     |> select_repo(options).all()
   end
 
@@ -614,6 +618,7 @@ defmodule Explorer.Chain do
     |> TokenTransfer.token_transfers_by_address_hash_and_token_address_hash(token_address_hash)
     |> join_associations(necessity_by_association)
     |> TokenTransfer.handle_paging_options(paging_options)
+    |> preload([token_transfers: [instances: :template]])
     |> select_repo(options).all()
   end
 
@@ -651,6 +656,7 @@ defmodule Explorer.Chain do
     |> handle_token_transfer_paging_options(paging_options)
     |> preload(transaction: :block)
     |> preload(:token)
+    |> preload([token_transfers: [instances: :template]])
     |> Repo.all()
   end
 
@@ -998,7 +1004,7 @@ defmodule Explorer.Chain do
     |> join(:inner, [transaction], block in assoc(transaction, :block))
     |> where([_, block], block.hash == ^block_hash)
     |> join_associations(necessity_by_association)
-    |> (&if(old_ui?, do: preload(&1, [{:token_transfers, [:token, :from_address, :to_address]}]), else: &1)).()
+    |> (&if(old_ui?, do: preload(&1, [{:token_transfers, [:token, :from_address, :to_address, :instances, instances: :template]}]), else: &1)).()
     |> select_repo(options).all()
     |> (&if(old_ui?,
           do: &1,
@@ -2165,6 +2171,7 @@ defmodule Explorer.Chain do
     Transaction
     |> where(hash: ^hash)
     |> join_associations(necessity_by_association)
+    |> preload([{:token_transfers, [:token, :instances, instances: :template]}])
     |> select_repo(options).one()
     |> case do
       nil ->
@@ -2242,7 +2249,7 @@ defmodule Explorer.Chain do
     fetch_transactions()
     |> where([transaction], transaction.hash in ^hashes)
     |> join_associations(necessity_by_association)
-    |> preload([{:token_transfers, [:token, :from_address, :to_address]}])
+    |> preload([{:token_transfers, [:token, :from_address, :to_address, :instances, instances: :template]}])
     |> Repo.all()
   end
 
@@ -2612,6 +2619,37 @@ defmodule Explorer.Chain do
       order_by: [desc_nulls_last: t.circulating_market_cap, desc_nulls_last: t.holder_count, asc: t.name],
       preload: [:contract_address]
     )
+  end
+
+  def list_top_templates(filter, options \\ []) do
+    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
+    fetch_top_templates(filter, paging_options, options)
+  end
+
+  defp fetch_top_templates(filter, paging_options, options) do
+    base_query_with_paging =
+      from(t in Template,
+        order_by: [desc_nulls_last: t.circulating_supply, desc_nulls_last: t.cap, asc: t.name],
+      )
+      |> page_tokens(paging_options)
+      |> limit(^paging_options.page_size)
+
+    query =
+      if filter && filter !== "" do
+        case prepare_search_term(filter) do
+          {:some, filter_term} ->
+            base_query_with_paging
+            |> where(fragment("to_tsvector('english', ' ' || name ) @@ to_tsquery(?)", ^filter_term))
+          _ ->
+            base_query_with_paging
+        end
+      else
+        base_query_with_paging
+      end
+
+    query
+    |> select_repo(options).all()
   end
 
   @doc """
@@ -3516,7 +3554,7 @@ defmodule Explorer.Chain do
     |> where([transaction], not is_nil(transaction.block_number) and not is_nil(transaction.index))
     |> handle_random_access_paging_options(paging_options)
     |> join_associations(necessity_by_association)
-    |> preload([{:token_transfers, [:token, :from_address, :to_address]}])
+    |> preload([{:token_transfers, [:token, :from_address, :to_address, :instances, instances: :template]}])
     |> Repo.all()
   end
 
@@ -3532,6 +3570,7 @@ defmodule Explorer.Chain do
     |> Repo.aggregate(:count, :hash)
   end
 
+  @spec fetch_recent_collated_transactions(any, nil | Explorer.PagingOptions.t(), map, any, any, keyword) :: any
   def fetch_recent_collated_transactions(
         old_ui?,
         paging_options,
@@ -3546,7 +3585,7 @@ defmodule Explorer.Chain do
     |> apply_filter_by_method_id_to_transactions(method_id_filter)
     |> apply_filter_by_tx_type_to_transactions(type_filter)
     |> join_associations(necessity_by_association)
-    |> (&if(old_ui?, do: preload(&1, [{:token_transfers, [:token, :from_address, :to_address]}]), else: &1)).()
+    |> (&if(old_ui?, do: preload(&1, [{:token_transfers, [:token, :from_address, :to_address, :instances, instances: :template]}]), else: &1)).()
     |> select_repo(options).all()
     |> (&if(old_ui?,
           do: &1,
@@ -3597,7 +3636,7 @@ defmodule Explorer.Chain do
     |> apply_filter_by_tx_type_to_transactions(type_filter)
     |> order_by([transaction], desc: transaction.inserted_at, asc: transaction.hash)
     |> join_associations(necessity_by_association)
-    |> (&if(old_ui?, do: preload(&1, [{:token_transfers, [:token, :from_address, :to_address]}]), else: &1)).()
+    |> (&if(old_ui?, do: preload(&1, [{:token_transfers, [:token, :from_address, :to_address, :instances, instances: :template]}]), else: &1)).()
     |> select_repo(options).all()
     |> (&if(old_ui?,
           do: &1,
@@ -3843,6 +3882,7 @@ defmodule Explorer.Chain do
     |> limit(^paging_options.page_size)
     |> order_by([token_transfer], asc: token_transfer.log_index)
     |> join_associations(necessity_by_association)
+    |> preload([instances: :template])
     |> select_repo(options).all()
   end
 
@@ -5172,6 +5212,31 @@ defmodule Explorer.Chain do
     end
   end
 
+  def template_from_id(id, options \\ []) do
+    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
+
+    query =
+      from(
+        t in Template,
+        where: t.id == ^id,
+        select: t
+      )
+
+    query
+    |> join_associations(necessity_by_association)
+    |> select_repo(options).one()
+    |> case do
+      nil ->
+        {:error, :not_found}
+
+      %Template{} = template ->
+        {:ok, template}
+
+      [%Template{} = template, nil] ->
+        {:ok, template}
+    end
+  end
+
   @spec fetch_token_transfers_from_token_hash(Hash.t(), [paging_options]) :: []
   def fetch_token_transfers_from_token_hash(token_address_hash, options \\ []) do
     TokenTransfer.fetch_token_transfers_from_token_hash(token_address_hash, options)
@@ -5350,6 +5415,16 @@ defmodule Explorer.Chain do
     end
   end
 
+  @spec upsert_template(
+    :invalid
+    | %{optional(:__struct__) => none, optional(atom | binary) => any}
+  ) :: any
+  def upsert_template(template_params) do
+    %Template{}
+    |> Template.changeset(template_params)
+    |> Repo.insert(on_conflict: :replace_all, conflict_target: :id)
+  end
+
   @spec fetch_last_token_balances(Hash.Address.t(), [api?]) :: []
   def fetch_last_token_balances(address_hash, options \\ []) do
     address_hash
@@ -5372,6 +5447,7 @@ defmodule Explorer.Chain do
           {:ok, Instance.t()} | {:error, :not_found}
   def erc721_or_erc1155_token_instance_from_token_id_and_token_address(token_id, token_contract_address, options \\ []) do
     query = Instance.token_instance_query(token_id, token_contract_address)
+            |> preload([:template])
 
     case select_repo(options).one(query) do
       nil -> {:error, :not_found}
@@ -5573,6 +5649,12 @@ defmodule Explorer.Chain do
   def fetch_token_holders_from_token_hash_and_token_id(contract_address_hash, token_id, options \\ []) do
     contract_address_hash
     |> CurrentTokenBalance.token_holders_1155_by_token_id(token_id, options)
+    |> select_repo(options).all()
+  end
+
+  def fetch_template_holders_from_template_id(template_id, options \\ []) do
+    template_id
+    |> Template.template_holders_by_template_id(options)
     |> select_repo(options).all()
   end
 

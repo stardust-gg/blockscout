@@ -21,6 +21,14 @@ defmodule BlockScoutWeb.Tokens.Instance.OverviewView do
   def total_supply?(%Token{total_supply: nil}), do: false
   def total_supply?(%Token{total_supply: _}), do: true
 
+  def format_max_supply(supply) do
+    if to_string(supply) == "39614081257132168796771975168" do
+      "Unlimited"
+    else
+      supply
+    end
+  end
+
   def media_src(instance, high_quality_media? \\ nil)
   def media_src(nil, _), do: @stub_image
 

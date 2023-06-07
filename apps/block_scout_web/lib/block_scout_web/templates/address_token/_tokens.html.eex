@@ -1,3 +1,5 @@
+<% instance = List.first(@token_balance.token_instances) %>
+<% template = Map.get(instance, :template) %>
 <tr data-identifier-hash="<%= @token.contract_address_hash %>">
   <td class="stakes-td">
   </td>
@@ -14,11 +16,9 @@
     <% end %>
   </td>
   <td class="stakes-td">
-    <%= link(
-          to: address_token_transfers_path(@conn, :index, to_string(@address.hash), to_string(@token.contract_address_hash)),
-          class: "tile-title-lg",
-          "data-test": "token_transfers_#{@token.contract_address_hash}"
-      ) do %>
+    <%= if template do %>
+      <%= template.name %>
+    <% else %>
       <%= token_name(@token) %>
     <% end %>
   </td>

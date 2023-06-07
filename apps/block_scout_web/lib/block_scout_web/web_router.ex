@@ -163,6 +163,8 @@ defmodule BlockScoutWeb.WebRouter do
 
     resources("/tokens", TokensController, only: [:index])
 
+    resources("/templates", TemplatesController, only: [:index])
+
     resources "/address", AddressController, only: [:show] do
       resources("/transactions", AddressTransactionController, only: [:index], as: :transaction)
 
@@ -313,6 +315,15 @@ defmodule BlockScoutWeb.WebRouter do
         AddressCoinBalanceByDayController,
         only: [:index],
         as: :coin_balance_by_day
+      )
+    end
+
+    resources "/template", Templates.TemplateController, only: [:show], as: :template do
+      resources(
+        "/template-holders",
+        Templates.HolderController,
+        only: [:index],
+        as: :holder
       )
     end
 

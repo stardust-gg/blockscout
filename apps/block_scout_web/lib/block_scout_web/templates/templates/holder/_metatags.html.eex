@@ -1,0 +1,1 @@
+<%= BlockScoutWeb.Templates.OverviewView.render "_metatags.html", conn: @conn, template: @template %>

@@ -1,20 +1,24 @@
+<% instances = Enum.filter(@transfer.instances, fn instance ->
+     Enum.member?(@transfer.token_ids, instance.token_id)
+   end) %>
+
 <%= case token_transfer_amount(@transfer) do %>
     <% {:ok, :erc721_instance} -> %>
-        <%= render BlockScoutWeb.TransactionView, "_transfer_token_with_id.html", transfer: @transfer, token_id: List.first(@transfer.token_ids) %>
+        <%= render BlockScoutWeb.TransactionView, "_transfer_token_with_id.html", transfer: @transfer, token_id: List.first(@transfer.token_ids), instance: List.first(instances) %>
     <% {:ok, :erc1155_instance, value} -> %>
         <% transfer_type = Chain.get_token_transfer_type(@transfer) %>
         <%= if transfer_type == :token_spawning do %>
-            <%= render BlockScoutWeb.TransactionView, "_transfer_token_with_id.html", transfer: @transfer, token_id: List.first(@transfer.token_ids) %>
+            <%= render BlockScoutWeb.TransactionView, "_transfer_token_with_id.html", transfer: @transfer, token_id: List.first(@transfer.token_ids), instance: List.first(instances) %>
         <% else %>
             <%= "#{value} " %>
-            <%= render BlockScoutWeb.TransactionView, "_transfer_token_with_id.html", transfer: @transfer, token_id: List.first(@transfer.token_ids) %>
+            <%= render BlockScoutWeb.TransactionView, "_transfer_token_with_id.html", transfer: @transfer, token_id: List.first(@transfer.token_ids), instance: List.first(instances) %>
         <% end %>
     <% {:ok, :erc1155_instance, values, token_ids, _decimals} -> %>
         <% values_ids = Enum.zip(values, token_ids) %>
         <%= for {value, token_id} <- values_ids do %>
             <div>
             <%= "#{value} "%>
-            <%= render BlockScoutWeb.TransactionView, "_transfer_token_with_id.html", transfer: @transfer, token_id: token_id %>
+            <%= render BlockScoutWeb.TransactionView, "_transfer_token_with_id.html", transfer: @transfer, token_id: token_id, instance: List.first(instances) %>
             </div>
         <% end %>
     <% {:ok, value} -> %>

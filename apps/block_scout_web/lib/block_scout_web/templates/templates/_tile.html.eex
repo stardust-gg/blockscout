@@ -1,0 +1,24 @@
+<tr data-identifier-hash="<%= @template.id %>">
+  <td class="stakes-td">
+      <!-- incremented number by order in the list -->
+      <span class="color-lighten">
+        <%= @index %>
+      </span>
+  </td>
+  <td class="stakes-td">
+    <% template = template_display_name(@template) %>
+    <%= link(template,
+      to: template_path(BlockScoutWeb.Endpoint, :show, @template.id),
+      "data-test": "token_link",
+      class: "text-truncate") %>
+  </td>
+  <td class="stakes-td">
+    <%= @template.id %>
+  </td>
+  <td class="stakes-td">
+    <%= @template.circulating_supply %>
+  </td>
+  <td class="stakes-td">
+    <%= format_max_supply(@template.cap) %>
+  </td>
+</tr>

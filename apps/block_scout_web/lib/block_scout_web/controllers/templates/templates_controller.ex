@@ -3,9 +3,6 @@ defmodule BlockScoutWeb.TemplatesController do
 
   import BlockScoutWeb.Chain, only: [paging_options: 1, next_page_params: 3, split_list_by_page: 1]
 
-  # TODO: add templates item view
-  # TODO: link to holder lists + info page
-
   alias BlockScoutWeb.{Controller, TemplatesView}
   alias Explorer.Chain
   alias Phoenix.View

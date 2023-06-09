@@ -30,7 +30,7 @@ defmodule Explorer.ThirdPartyIntegrations.Stardust do
   end
 
   defp handle_response({:ok, %HTTPoison.Response{status_code: 200, body: body}}) do
-    Jason.decode!(body)
+    {:ok, Jason.decode!(body)}
   end
 
   defp handle_response({:ok, %HTTPoison.Response{status_code: status, body: body}}) do

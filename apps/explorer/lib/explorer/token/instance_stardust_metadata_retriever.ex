@@ -126,9 +126,9 @@ defmodule Explorer.Token.StardustMetadataRetriever do
 
   def fetch_metadata(contract_address_hash, token_id) do
     if contract_address_hash == String.downcase(@token_contract_address) do
-      with tokens <- Stardust.get_token(token_id),
+      with {:ok, tokens} <- Stardust.get_token(token_id),
            %{ "templateId" => templateId } when not is_nil(templateId) <- List.first(tokens),
-           template <- Stardust.get_template(@game_id, templateId) do
+           {:ok, template} <- Stardust.get_template(@game_id, templateId) do
         {:ok, template, List.first(tokens)}
       else
         error ->
@@ -138,6 +138,7 @@ defmodule Explorer.Token.StardustMetadataRetriever do
       {:error, "Not interfacing with a Stardust token contract address"}
     end
   end
+
 
   # since can't read from contract, we will just brute force the get_template
   #game_id = Reader.query_contract(contract_address_hash, nil, @stardust_token_contract_abi,

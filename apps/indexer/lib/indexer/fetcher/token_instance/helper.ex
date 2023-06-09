@@ -43,7 +43,8 @@ defmodule Indexer.Fetcher.TokenInstance.Helper do
         %{}
     end
   end
-  defp handle_stardust_metadata(_), do: %{}
+  defp handle_stardust_metadata({:error, _error}), do: {nil, nil}
+  defp handle_stardust_metadata(_), do: {nil, nil}
 
   defp prepare_token_id(%Decimal{} = token_id), do: Decimal.to_integer(token_id)
   defp prepare_token_id(token_id), do: token_id

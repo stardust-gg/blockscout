@@ -2632,7 +2632,7 @@ defmodule Explorer.Chain do
       from(t in Template,
         order_by: [desc_nulls_last: t.circulating_supply, desc_nulls_last: t.cap, asc: t.name],
       )
-      |> page_tokens(paging_options)
+      |> page_templates(paging_options)
       |> limit(^paging_options.page_size)
 
     query =
@@ -4763,6 +4763,8 @@ defmodule Explorer.Chain do
           address.fetched_coin_balance < ^coin_balance
     )
   end
+
+  defp page_templates(query, %PagingOptions{key: nil}), do: query
 
   defp page_tokens(query, %PagingOptions{key: nil}), do: query
 

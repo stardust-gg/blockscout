@@ -30,6 +30,7 @@ defmodule BlockScoutWeb.Chain do
     Token.Instance,
     TokenTransfer,
     Transaction,
+    Template,
     Wei,
     Withdrawal
   }
@@ -366,6 +367,10 @@ defmodule BlockScoutWeb.Chain do
 
   defp paging_params({%Address{hash: hash, fetched_coin_balance: fetched_coin_balance}, _}) do
     %{"hash" => hash, "fetched_coin_balance" => Decimal.to_string(fetched_coin_balance.value)}
+  end
+
+  defp paging_params(%Template{circulating_supply: circulating_supply, name: name, id: id}) do
+    %{"circulating_supply" => circulating_supply, "name" => name, "id" => id}
   end
 
   defp paging_params(%Token{

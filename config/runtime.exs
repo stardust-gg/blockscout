@@ -81,7 +81,11 @@ config :block_scout_web, :footer,
   telegram_link_enabled: ConfigHelper.parse_bool_env_var("FOOTER_TELEGRAM_LINK_ENABLED"),
   telegram_link: System.get_env("FOOTER_TELEGRAM_LINK"),
   link_to_other_explorers: ConfigHelper.parse_bool_env_var("FOOTER_LINK_TO_OTHER_EXPLORERS"),
-  other_explorers: System.get_env("FOOTER_OTHER_EXPLORERS", "")
+  other_explorers: System.get_env("FOOTER_OTHER_EXPLORERS", ""),
+  website_link: System.get_env("WEBSITE_LINK"),
+  docs_link: System.get_env("DOCS_LINK"),
+  discord_link: System.get_env("DISCORD_LINK"),
+  twitter_link: System.get_env("TWITTER_LINK")
 
 config :block_scout_web, :contract,
   verification_max_libraries: ConfigHelper.parse_integer_env_var("CONTRACT_VERIFICATION_MAX_LIBRARIES", 10),

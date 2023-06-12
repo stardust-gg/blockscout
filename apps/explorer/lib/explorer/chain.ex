@@ -2630,7 +2630,7 @@ defmodule Explorer.Chain do
   defp fetch_top_templates(filter, paging_options, options) do
     base_query_with_paging =
       from(t in Template,
-        order_by: [desc_nulls_last: t.circulating_supply, desc_nulls_last: t.cap, asc: t.name],
+        order_by: [desc: t.circulating_supply, asc: t.name]
       )
       |> page_templates(paging_options)
       |> limit(^paging_options.page_size)
@@ -4765,6 +4765,14 @@ defmodule Explorer.Chain do
   end
 
   defp page_templates(query, %PagingOptions{key: nil}), do: query
+
+  defp page_templates(query, %PagingOptions{key: {circulating_supply, name}}) do
+    from(template in query,
+      where:
+        (template.circulating_supply < ^circulating_supply
+        or (template.circulating_supply == ^circulating_supply and template.name > ^name))
+      )
+  end
 
   defp page_tokens(query, %PagingOptions{key: nil}), do: query
 

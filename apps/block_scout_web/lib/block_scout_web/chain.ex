@@ -290,6 +290,9 @@ defmodule BlockScoutWeb.Chain do
     [paging_options: %{@default_paging_options | key: {id}}]
   end
 
+  def paging_options(%{"circulating_supply" => circulating_supply, "name" => name}),
+  do: [paging_options: %{@default_paging_options | key: {circulating_supply, name}}]
+
   def paging_options(_params), do: [paging_options: @default_paging_options]
 
   def put_key_value_to_paging_options([paging_options: paging_options], key, value) do
@@ -363,6 +366,10 @@ defmodule BlockScoutWeb.Chain do
       {:ok, hash} -> find_or_insert_address_from_hash(hash)
       _ -> {:error, :not_found}
     end
+  end
+
+  defp paging_params(%{address_hash: address_hash, value: value}) do
+    %{"address_hash" => address_hash, "value" => Decimal.to_string(value)}
   end
 
   defp paging_params({%Address{hash: hash, fetched_coin_balance: fetched_coin_balance}, _}) do

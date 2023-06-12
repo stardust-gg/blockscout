@@ -4,6 +4,7 @@ defmodule BlockScoutWeb.LayoutView do
   alias Explorer.Chain
   alias Plug.Conn
   alias Poison.Parser
+  alias Explorer.PagingOptions
 
   import BlockScoutWeb.APIDocsView, only: [blockscout_url: 1]
 

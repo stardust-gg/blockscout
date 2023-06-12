@@ -69,8 +69,11 @@ defmodule Explorer.Chain.Template do
   defp page_template_balances(query, %PagingOptions{key: nil}), do: query
 
   defp page_template_balances(query, %PagingOptions{key: {value, address_hash}}) do
-    query
-    |> having([tb], fragment("? < ? or (? = ? and ? < ?)", fragment("value"), ^value, fragment("value"), ^value, tb.address_hash, ^address_hash))
+    from(holder_balance in query,
+      where:
+        (holder_balance.value < ^value
+        or (holder_balance.value == ^value and holder_balance.address_hash < ^address_hash))
+      )
   end
 
   defp trim_name(%Changeset{valid?: false} = changeset), do: changeset

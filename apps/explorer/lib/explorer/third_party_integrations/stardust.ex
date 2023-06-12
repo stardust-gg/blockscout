@@ -8,7 +8,10 @@ defmodule Explorer.ThirdPartyIntegrations.Stardust do
   defp make_request(endpoint, method, params \\ []) do
     url = "#{@base_url}/#{endpoint}"
     headers = [{"x-api-key", @api_key}]
-    options = [params: params]
+    options = [
+      params: params,
+      timeout: 50_000
+    ]
 
     case method do
       :get -> HTTPoison.get(url, headers, options)

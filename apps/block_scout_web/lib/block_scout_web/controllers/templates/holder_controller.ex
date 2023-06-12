@@ -32,8 +32,6 @@ defmodule BlockScoutWeb.Templates.HolderController do
             template_holder_path(conn, :index, template_id, Map.delete(next_page_params, "type"))
         end
 
-      IO.inspect template_balances_paginated
-
       template_balances_json =
         Enum.map(template_balances_paginated, fn template_balance ->
           View.render_to_string(HolderView, "_template_balances.html",

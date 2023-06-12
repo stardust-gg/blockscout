@@ -17,6 +17,9 @@ defmodule BlockScoutWeb.TemplatesView do
 
   def template_display_name(%Template{name: name, symbol: symbol}), do: "#{name} (#{symbol})"
 
+  def template_image_url(%Template{image_url: nil}), do: ""
+  def template_image_url(%Template{image_url: image_url}), do: image_url
+
   def format_max_supply(supply) do
     if to_string(supply) == "39614081257132168796771975168" do
       "Unlimited"

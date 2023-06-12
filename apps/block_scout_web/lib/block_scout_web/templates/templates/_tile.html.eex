@@ -6,6 +6,13 @@
       </span>
   </td>
   <td class="stakes-td">
+    <img
+      width=15
+      height=15
+      src="<%= template_image_url(@template) %>"
+      style="margin-top: -2px; min-height: 25px; min-width: 25px; border: none; outline: none;border-radius: 11%;" alt="" onerror="if (this.src != '/images/icons/token_icon_default.svg') this.src = '/images/icons/token_icon_default.svg';"/>
+  </td>
+  <td class="stakes-td">
     <% template = template_display_name(@template) %>
     <%= link(template,
       to: template_path(BlockScoutWeb.Endpoint, :show, @template.id),

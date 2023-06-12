@@ -17,6 +17,7 @@ defmodule Explorer.Chain.Template do
           cap: non_neg_integer(),
           game_id: non_neg_integer(),
           circulating_supply: non_neg_integer(),
+          image_url: String.t() | nil
         }
   @primary_key {:id, :integer, autogenerate: false}
   schema "templates" do
@@ -25,6 +26,7 @@ defmodule Explorer.Chain.Template do
     field(:game_id, :decimal)
     field(:cap, :decimal)
     field(:circulating_supply, :decimal)
+    field(:image_url, :string)
 
     has_many(
       :tokens,
@@ -34,7 +36,7 @@ defmodule Explorer.Chain.Template do
   end
 
   @required_attrs ~w(id name game_id cap circulating_supply)a
-  @optional_attrs ~w(symbol)a
+  @optional_attrs ~w(symbol image_url)a
 
   def changeset(%Template{} = template, params \\ %{}) do
     template

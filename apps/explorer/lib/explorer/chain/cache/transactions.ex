@@ -13,9 +13,7 @@ defmodule Explorer.Chain.Cache.Transactions do
       created_contract_address: :names,
       from_address: :names,
       to_address: :names,
-      token_transfers: :token,
-      token_transfers: :from_address,
-      token_transfers: :to_address
+      token_transfers: [:token, :from_address, :to_address, instances: :template]
     ],
     ttl_check_interval: Application.get_env(:explorer, __MODULE__)[:ttl_check_interval],
     global_ttl: Application.get_env(:explorer, __MODULE__)[:global_ttl]

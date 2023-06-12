@@ -35,7 +35,8 @@ defmodule Indexer.Fetcher.TokenInstance.Helper do
            "symbol" => template["symbol"],
            "game_id" => template["gameId"],
            "cap" => cap,
-           "circulating_supply" => total_supply
+           "circulating_supply" => total_supply,
+           "image_url" => get_in(template, ["props", "inherited", "image"])
          }) do
       {template, token}
     else

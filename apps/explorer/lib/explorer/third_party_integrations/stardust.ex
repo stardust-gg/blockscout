@@ -1,13 +1,12 @@
 defmodule Explorer.ThirdPartyIntegrations.Stardust do
-  @base_url System.get_env("STARDUST_API_BASE_URL")
-  @api_key System.get_env("STARDUST_API_KEY")
-
   require HTTPoison
   import Jason
 
   defp make_request(endpoint, method, params \\ []) do
-    url = "#{@base_url}/#{endpoint}"
-    headers = [{"x-api-key", @api_key}]
+    base_url = Application.get_env(:block_scout_web, :api_config)[:base_url]
+    url = "#{base_url}/#{endpoint}"
+    api_key = Application.get_env(:block_scout_web, :api_config)[:api_key]
+    headers = [{"x-api-key", api_key}]
     options = [
       params: params,
       timeout: 50_000

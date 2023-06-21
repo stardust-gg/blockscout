@@ -87,6 +87,13 @@ config :block_scout_web, :footer,
   discord_link: System.get_env("DISCORD_LINK"),
   twitter_link: System.get_env("TWITTER_LINK")
 
+config :block_scout_web, :api_config,
+  api_key: System.get_env("STARDUST_API_KEY"),
+  base_url: System.get_env("STARDUST_API_BASE_URL"),
+  token_contract_address: System.get_env("STARDUST_TOKEN_CONTRACT_ADDRESS"),
+  template_contract_address: System.get_env("STARDUST_TEMPLATE_CONTRACT_ADDRESS"),
+  game_id: System.get_env("STARDUST_GAME_ID")
+
 config :block_scout_web, :contract,
   verification_max_libraries: ConfigHelper.parse_integer_env_var("CONTRACT_VERIFICATION_MAX_LIBRARIES", 10),
   max_length_to_show_string_without_trimming: System.get_env("CONTRACT_MAX_STRING_LENGTH_WITHOUT_TRIMMING", "2040"),

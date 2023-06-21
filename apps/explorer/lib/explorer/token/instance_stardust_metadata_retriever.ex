@@ -1,8 +1,4 @@
 defmodule Explorer.Token.StardustMetadataRetriever do
-  @token_contract_address System.get_env("STARDUST_TOKEN_CONTRACT_ADDRESS")
-  @template_contract_address System.get_env("STARDUST_TEMPLATE_CONTRACT_ADDRESS")
-  @game_id System.get_env("STARDUST_GAME_ID")
-
   require Logger
 
   alias Explorer.SmartContract.Reader
@@ -125,10 +121,12 @@ defmodule Explorer.Token.StardustMetadataRetriever do
   @token_supplies "c0c81969"
 
   def fetch_metadata(contract_address_hash, token_id) do
-    if contract_address_hash == String.downcase(@token_contract_address) do
+    token_contract_address = Application.get_env(:block_scout_web, :api_config)[:token_contract_address]
+    game_id = Application.get_env(:block_scout_web, :api_config)[:game_id]
+    if contract_address_hash == String.downcase(token_contract_address) do
       with {:ok, tokens} <- Stardust.get_token(token_id),
            %{ "templateId" => templateId } when not is_nil(templateId) <- List.first(tokens),
-           {:ok, template} <- Stardust.get_template(@game_id, templateId) do
+           {:ok, template} <- Stardust.get_template(game_id, templateId) do
         {:ok, template, List.first(tokens)}
       else
         error ->
